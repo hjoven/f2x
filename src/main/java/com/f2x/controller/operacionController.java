@@ -28,6 +28,7 @@ public class operacionController {
 	public List<Map<String, Object>> sesiones = new ArrayList<Map<String, Object>>();
 	public int contadorSesion = 0;
 	public String cadenaOperacion = "";
+	public int validacion = 0;
 	
 	@GetMapping("iniciarSesion")
 	public ResponseEntity<?> sessiones() {
@@ -39,42 +40,55 @@ public class operacionController {
 	
 	@GetMapping("agregarOperando/{sesion}/{numero}")
 	public ResponseEntity<?> agregarOperando(@PathVariable int sesion, @PathVariable int numero) {
-		sesiones.forEach(item -> {
-			if ((int) item.get("identificador") == sesion) {
-				List<String> lista = new ArrayList<String>();
-				if (!item.containsKey("items")) {
-					lista.add(String.valueOf(numero));
-				} else {
-					lista = (List<String>) item.get("items");
-					lista.add(String.valueOf(numero));
+		if(validacion==0) {
+			sesiones.forEach(item -> {
+				if ((int) item.get("identificador") == sesion) {
+					List<String> lista = new ArrayList<String>();
+					if (!item.containsKey("items")) {
+						lista.add(String.valueOf(numero));
+					} else {
+						lista = (List<String>) item.get("items");
+						lista.add(String.valueOf(numero));
+					}
+					item.put("items", lista);
 				}
-				item.put("items", lista);
-			}
-		});
+			});
+			this.validacion = 1;
+		}
+		else {
+			return new ResponseEntity<>("Error, debe agregar un signo ", HttpStatus.CONFLICT);
+		}
 	    return new ResponseEntity<>(sesiones, HttpStatus.OK);
 	}
 	
 	@GetMapping("agregarSigno/{sesion}/{signo}")
 	public ResponseEntity<?> agregarSigno(@PathVariable int sesion, @PathVariable String signo) {
 		
-		
-		
-		if(this.validateOperator(signo).equals("Error")) {
-			
-			return new ResponseEntity<>("Error, el signo "+signo+" no existe", HttpStatus.CONFLICT);
-		}
-		sesiones.forEach(item -> {
-			if ((int) item.get("identificador") == sesion) {
-				List<String> lista = new ArrayList<String>();
-				if (!item.containsKey("items")) {
-					lista.add(this.validateOperator(signo));
-				} else {
-					lista = (List<String>) item.get("items");
-					lista.add(this.validateOperator(signo));
-				}
-				item.put("items", lista);
+		if(this.validacion==1) {
+			if(this.validateOperator(signo).equals("Error")) {
+				
+				return new ResponseEntity<>("Error, el signo "+signo+" no existe", HttpStatus.CONFLICT);
 			}
-		});
+			sesiones.forEach(item -> {
+				if ((int) item.get("identificador") == sesion) {
+					List<String> lista = new ArrayList<String>();
+					if (!item.containsKey("items")) {
+						lista.add(this.validateOperator(signo));
+					} else {
+						lista = (List<String>) item.get("items");
+						lista.add(this.validateOperator(signo));
+					}
+					item.put("items", lista);
+				}
+			});
+			
+			this.validacion=0;
+		}
+		else {
+			return new ResponseEntity<>("Error, debe agregar primero numeros", HttpStatus.OK);
+		}
+		
+		
 		return new ResponseEntity<>(sesiones, HttpStatus.OK);
 	}
 	

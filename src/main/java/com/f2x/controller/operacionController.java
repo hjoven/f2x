@@ -40,25 +40,36 @@ public class operacionController {
 	
 	@GetMapping("agregarOperando/{sesion}/{numero}")
 	public ResponseEntity<?> agregarOperando(@PathVariable int sesion, @PathVariable int numero) {
-		if(validacion==0) {
-			sesiones.forEach(item -> {
-				if ((int) item.get("identificador") == sesion) {
-					List<String> lista = new ArrayList<String>();
-					if (!item.containsKey("items")) {
-						lista.add(String.valueOf(numero));
-					} else {
-						lista = (List<String>) item.get("items");
-						lista.add(String.valueOf(numero));
+		
+		try {
+			
+			if(validacion==0) {
+				sesiones.forEach(item -> {
+					if ((int) item.get("identificador") == sesion) {
+						List<String> lista = new ArrayList<String>();
+						if (!item.containsKey("items")) {
+							lista.add(String.valueOf(numero));
+						} else {
+							lista = (List<String>) item.get("items");
+							lista.add(String.valueOf(numero));
+						}
+						item.put("items", lista);
 					}
-					item.put("items", lista);
-				}
-			});
-			this.validacion = 1;
-		}
-		else {
-			return new ResponseEntity<>("Error, debe agregar un signo ", HttpStatus.CONFLICT);
-		}
-	    return new ResponseEntity<>(sesiones, HttpStatus.OK);
+				});
+				this.validacion = 1;
+			}
+			else {
+				return new ResponseEntity<>("Error, debe agregar un signo ", HttpStatus.CONFLICT);
+			}
+		   
+			
+		} catch (Exception e) {
+			return new ResponseEntity<>("Error, debe ingresar un numero ", HttpStatus.CONFLICT);
+            
+        }
+		 return new ResponseEntity<>(sesiones, HttpStatus.OK);
+		
+		
 	}
 	
 	@GetMapping("agregarSigno/{sesion}/{signo}")

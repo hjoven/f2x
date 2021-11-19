@@ -73,6 +73,7 @@ public class operacionController {
 	
 	@GetMapping("calcular/{sesion}")
 	public ResponseEntity<?> calcular(@PathVariable int sesion) throws ScriptException {
+		System.out.println("aaaaaaaaaaaaaa");
 		this.cadenaOperacion = "";
 		sesiones.forEach(item -> {
 			if ((int) item.get("identificador") == sesion) {
@@ -86,8 +87,12 @@ public class operacionController {
 			}
 		});
 		
+		  ScriptEngineManager mgr = new ScriptEngineManager();
+		  ScriptEngine engine = mgr.getEngineByName("JavaScript");
+		  String foo = "40+2";
+		  System.out.println(engine.eval("40+2"));
 		
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		return new ResponseEntity<>(String.valueOf(this.cadenaOperacion), HttpStatus.OK);
 	}
 	
 	private String validateOperator(String operator) {

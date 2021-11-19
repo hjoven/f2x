@@ -1,0 +1,14 @@
+version: '3'  
+services:
+  f2x:
+    image: f2x
+    container_name: f2x
+    build: 
+      context: ./
+    ports:  
+    - "8004:9091"
+    networks:
+    - network_f2x
+networks:
+  network_f2x:
+     external: true

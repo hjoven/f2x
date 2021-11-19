@@ -56,6 +56,13 @@ public class operacionController {
 	
 	@GetMapping("agregarSigno/{sesion}/{signo}")
 	public ResponseEntity<?> agregarSigno(@PathVariable int sesion, @PathVariable String signo) {
+		
+		
+		
+		if(this.validateOperator(signo).equals("Error")) {
+			
+			return new ResponseEntity<>("Error, el signo "+signo+" no existe", HttpStatus.CONFLICT);
+		}
 		sesiones.forEach(item -> {
 			if ((int) item.get("identificador") == sesion) {
 				List<String> lista = new ArrayList<String>();
@@ -158,7 +165,7 @@ public class operacionController {
 	    
 	   
 	    
-		return new ResponseEntity<>(String.valueOf(operacion), HttpStatus.OK);
+		return new ResponseEntity<>(operacion, HttpStatus.OK);
 	}
 	
 	private String validateOperator(String operator) {

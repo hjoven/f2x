@@ -73,7 +73,15 @@ public class operacionController {
 	
 	@GetMapping("calcular/{sesion}")
 	public ResponseEntity<?> calcular(@PathVariable int sesion) throws ScriptException {
-		System.out.println("aaaaaaaaaaaaaa");
+		
+		final char SUMA='+';
+	    final char RESTA='-';
+	    final char MULTIPLICACION='*';
+	    boolean firstSign=true;
+	    char lastOp='+';
+	    int operacion=0;        
+	    String numero = "";
+		
 		this.cadenaOperacion = "";
 		sesiones.forEach(item -> {
 			if ((int) item.get("identificador") == sesion) {
@@ -87,12 +95,70 @@ public class operacionController {
 			}
 		});
 		
-		  ScriptEngineManager mgr = new ScriptEngineManager();
-		  ScriptEngine engine = mgr.getEngineByName("JavaScript");
-		  String foo = "40+2";
-		  System.out.println(engine.eval("40+2"));
-		
-		return new ResponseEntity<>(String.valueOf(this.cadenaOperacion), HttpStatus.OK);
+
+
+	    for (int x = 0; x < cadenaOperacion.length(); x++) { // numero de caracteres de la cadena
+
+
+	        if (cadenaOperacion.charAt(x) == SUMA || cadenaOperacion.charAt(x) == RESTA) {
+	            if(firstSign)//Solo lo usamos para la primera operacion
+	            {
+	                operacion = Integer.parseInt(numero);
+	                firstSign=false;        
+	            }
+	            else
+	            {
+	                if(lastOp == SUMA)
+	                {
+	                    //Suma
+	                    operacion = operacion + Integer.parseInt(numero);
+
+	                }
+	                else if(lastOp == MULTIPLICACION)
+	        	    {
+	        	        //multiplicacion
+	        	        operacion = operacion + Integer.parseInt(numero);
+
+	        	    }
+	                else
+	                {
+	                    //Resta
+	                    operacion = operacion - Integer.parseInt(numero);
+
+	                }
+	            }
+	            lastOp=cadenaOperacion.charAt(x);//Almacenamos la ultima operacion
+
+	            numero = "";
+	        } else {
+	            numero = numero + Character.toString(cadenaOperacion.charAt(x));
+	        }
+	    }
+
+
+	    // sumamos/restamos el ultimo digito
+	    if(lastOp == SUMA)
+	    {
+	        //Suma
+	        operacion = operacion + Integer.parseInt(numero);
+
+	    }
+	    else if(lastOp == MULTIPLICACION)
+	    {
+	        //multiplicacion
+	        operacion = operacion + Integer.parseInt(numero);
+
+	    }
+	    else
+	    {
+	        //Resta
+	        operacion = operacion - Integer.parseInt(numero);
+
+	    }
+	    
+	   
+	    
+		return new ResponseEntity<>(String.valueOf(operacion), HttpStatus.OK);
 	}
 	
 	private String validateOperator(String operator) {
